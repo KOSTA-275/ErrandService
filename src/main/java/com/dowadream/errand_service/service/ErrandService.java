@@ -1,86 +1,109 @@
 package com.dowadream.errand_service.service;
 
+import com.dowadream.errand_service.dto.ErrandDTO;
+import com.dowadream.errand_service.entity.Category;
 import com.dowadream.errand_service.entity.Errand;
+import com.dowadream.errand_service.entity.Image;
+import com.dowadream.errand_service.repository.CategoryRepository;
 import com.dowadream.errand_service.repository.ErrandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * 심부름 관련 비즈니스 로직 처리클래스
- */
 @Service
 public class ErrandService {
 
     private final ErrandRepository errandRepository;
+    private final CategoryRepository categoryRepository;
+    private final FileStorageService fileStorageService;
 
     @Autowired
-    public ErrandService(ErrandRepository errandRepository) {
+    public ErrandService(ErrandRepository errandRepository, CategoryRepository categoryRepository, FileStorageService fileStorageService) {
         this.errandRepository = errandRepository;
+        this.categoryRepository = categoryRepository;
+        this.fileStorageService = fileStorageService;
     }
 
-    /**
-     * 모든 심부름 정보를 조회
-     * @return 전체 심부름 목록
-     */
     public List<Errand> getAllErrands() {
         return errandRepository.findAll();
     }
 
-    /**
-     * 특정 ID의 심부름 정보를 조회합니다.
-     * @param id 심부름 ID
-     * @return 조회된 심부름 정보 (Optional)
-     */
     public Optional<Errand> getErrandById(Long id) {
         return errandRepository.findById(id);
     }
 
-    /**
-     * 새로운 심부름을 생성합니다.
-     * @param errand 생성할 심부름 정보
-     * @return 생성된 심부름
-     */
-    public Errand createErrand(Errand errand) {
-        return errandRepository.save(errand);
+    @Transactional
+    public Errand createErrand(ErrandDTO errandDTO) throws IOException {
+        Errand errand = new Errand();
+        errand.setTitle(errandDTO.getTitle());
+        errand.setDescription(errandDTO.getDescription());
+        errand.setStatus(errandDTO.getStatus());
+        errand.setRequesterSeq(errandDTO.getRequesterSeq());
+        errand.setRunnerSeq(errandDTO.getRunnerSeq());
+
+        Category category = categoryRepository.findById(errandDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        errand.setCategory(category);
+
+        errand = errandRepository.save(errand);
+
+        if (errandDTO.getImages() != null && !errandDTO.getImages().isEmpty()) {
+            for (MultipartFile file : errandDTO.getImages()) {
+                String fileName = fileStorageService.storeFile(file);
+                Image image = new Image();
+                image.setFileName(fileName);
+                image.setFilePath(fileStorageService.getFileStorageLocation().resolve(fileName).toString());
+                image.setFileType(file.getContentType());
+                image.setFileSize((int) file.getSize());
+                image.setErrand(errand);
+                image.setRelatedType(Image.RelatedType.ERRAND);
+                errand.getImages().add(image);
+            }
+        }
+
+        return errand;
     }
 
-    /**
-     * 기존 심부름 정보를 수정합니다.
-     * @param id 수정할 심부름 ID
-     * @param errandDetails 수정할 심부름 정보
-     * @return 수정된 심부름
-     */
-    public Errand updateErrand(Long id, Errand errandDetails) {
+    @Transactional
+    public Errand updateErrand(Long id, ErrandDTO errandDTO) throws IOException {
         Errand errand = errandRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("심부름을 찾을 수 없습니다"));
 
-        errand.setTitle(errandDetails.getTitle());
-        errand.setDescription(errandDetails.getDescription());
-        errand.setStatus(errandDetails.getStatus());
-        errand.setRequesterSeq(errandDetails.getRequesterSeq());
-        errand.setRunnerSeq(errandDetails.getRunnerSeq());
-        errand.setCategory(errandDetails.getCategory());
+        errand.setTitle(errandDTO.getTitle());
+        errand.setDescription(errandDTO.getDescription());
+        errand.setStatus(errandDTO.getStatus());
+        errand.setRequesterSeq(errandDTO.getRequesterSeq());
+        errand.setRunnerSeq(errandDTO.getRunnerSeq());
+
+        Category category = categoryRepository.findById(errandDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        errand.setCategory(category);
+
+        if (errandDTO.getImages() != null && !errandDTO.getImages().isEmpty()) {
+            for (MultipartFile file : errandDTO.getImages()) {
+                String fileName = fileStorageService.storeFile(file);
+                Image image = new Image();
+                image.setFileName(fileName);
+                image.setFilePath(fileStorageService.getFileStorageLocation().resolve(fileName).toString());
+                image.setFileType(file.getContentType());
+                image.setFileSize((int) file.getSize());
+                errand.addImage(image);
+            }
+        }
 
         return errandRepository.save(errand);
     }
 
-    /**
-     * 특정 심부름을 삭제합니다.
-     * @param id 삭제할 심부름 ID
-     */
     public void deleteErrand(Long id) {
         errandRepository.deleteById(id);
     }
 
-    /**
-     * 특정 카테고리에 속한 심부름을 조회합니다.
-     * @param categoryId 카테고리 ID
-     * @return 해당 카테고리의 심부름 목록
-     */
     public List<Errand> getErrandsByCategory(Long categoryId) {
         return errandRepository.findAll().stream()
                 .filter(errand -> errand.getCategory().getCategoryId().equals(categoryId))

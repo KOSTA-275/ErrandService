@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "errands")
@@ -42,4 +44,17 @@ public class Errand {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToMany(mappedBy = "errand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
+    public void addImage(Image image) {
+        images.add(image);
+        image.setErrand(this);
+    }
+
+    public void removeImage(Image image) {
+        images.remove(image);
+        image.setErrand(null);
+    }
 }
