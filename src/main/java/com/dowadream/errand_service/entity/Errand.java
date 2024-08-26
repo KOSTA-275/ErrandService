@@ -1,9 +1,7 @@
 package com.dowadream.errand_service.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,13 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "errands")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Errand {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "errand_seq_generator")
-    @SequenceGenerator(name = "errand_seq_generator", sequenceName = "errand_seq", allocationSize = 1)
-    @Column(name = "errand_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "errand_seq")
+    @SequenceGenerator(name = "errand_seq", sequenceName = "errand_seq", allocationSize = 1)
     private Long errandSeq;
 
     @Column(nullable = false, length = 100)
@@ -43,4 +38,8 @@ public class Errand {
     @UpdateTimestamp
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
