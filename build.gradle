@@ -34,8 +34,21 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	//Eureka Discovery Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	//config client
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
+}
 
+//Eureka Discovey Client
+ext {
+	set('springCloudVersion', "2023.0.3")
+}
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 
