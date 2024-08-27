@@ -1,89 +1,125 @@
 package com.dowadream.errand_service.service;
 
+import com.dowadream.errand_service.dto.ServiceOfferingDTO;
+import com.dowadream.errand_service.entity.Category;
+import com.dowadream.errand_service.entity.Image;
 import com.dowadream.errand_service.entity.ServiceOffering;
+import com.dowadream.errand_service.repository.CategoryRepository;
+import com.dowadream.errand_service.repository.ImageRepository;
 import com.dowadream.errand_service.repository.ServiceOfferingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-/**
- * 서비스 제공 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
- */
 @Service
+@Transactional
 public class ServiceOfferingService {
 
     private final ServiceOfferingRepository serviceOfferingRepository;
+    private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
+    private final FileStorageService fileStorageService;
 
     @Autowired
-    public ServiceOfferingService(ServiceOfferingRepository serviceOfferingRepository) {
+    public ServiceOfferingService(ServiceOfferingRepository serviceOfferingRepository,
+                                  CategoryRepository categoryRepository,
+                                  ImageRepository imageRepository,
+                                  FileStorageService fileStorageService) {
         this.serviceOfferingRepository = serviceOfferingRepository;
+        this.categoryRepository = categoryRepository;
+        this.imageRepository = imageRepository;
+        this.fileStorageService = fileStorageService;
     }
 
-    /**
-     * 모든 서비스 제공 정보를 조회합니다.
-     * @return 전체 서비스 제공 목록
-     */
-    public List<ServiceOffering> getAllServiceOfferings() {
-        return serviceOfferingRepository.findAll();
+    public Page<ServiceOfferingDTO> getAllServiceOfferings(Pageable pageable) {
+        return serviceOfferingRepository.findAll(pageable).map(this::convertToDTO);
     }
 
-    /**
-     * 특정 ID의 서비스 제공 정보를 조회합니다.
-     * @param id 서비스 제공 ID
-     * @return 조회된 서비스 제공 정보 (Optional)
-     */
-    public Optional<ServiceOffering> getServiceOfferingById(Long id) {
-        return serviceOfferingRepository.findById(id);
+    public Optional<ServiceOfferingDTO> getServiceOfferingById(Long id) {
+        return serviceOfferingRepository.findById(id).map(this::convertToDTO);
     }
 
-    /**
-     * 새로운 서비스 제공 정보를 생성합니다.
-     * @param serviceOffering 생성할 서비스 제공 정보
-     * @return 생성된 서비스 제공 정보
-     */
-    public ServiceOffering createServiceOffering(ServiceOffering serviceOffering) {
-        return serviceOfferingRepository.save(serviceOffering);
+    public ServiceOfferingDTO createServiceOffering(ServiceOfferingDTO dto) throws IOException {
+        ServiceOffering serviceOffering = convertToEntity(dto);
+
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            List<Image> images = uploadImages(dto.getImages());
+            images.forEach(serviceOffering::addImage);
+        }
+
+        return convertToDTO(serviceOfferingRepository.save(serviceOffering));
     }
 
-    /**
-     * 기존 서비스 제공 정보를 수정합니다.
-     * @param id 수정할 서비스 제공 ID
-     * @param serviceOfferingDetails 수정할 서비스 제공 정보
-     * @return 수정된 서비스 제공 정보
-     */
-    public ServiceOffering updateServiceOffering(Long id, ServiceOffering serviceOfferingDetails) {
+    public ServiceOfferingDTO updateServiceOffering(Long id, ServiceOfferingDTO dto) throws IOException {
         ServiceOffering serviceOffering = serviceOfferingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("서비스 제공 정보를 찾을 수 없습니다"));
+                .orElseThrow(() -> new RuntimeException("Service offering not found"));
+        updateServiceOfferingFromDTO(serviceOffering, dto);
 
-        serviceOffering.setTitle(serviceOfferingDetails.getTitle());
-        serviceOffering.setDescription(serviceOfferingDetails.getDescription());
-        serviceOffering.setPriceRange(serviceOfferingDetails.getPriceRange());
-        serviceOffering.setLocation(serviceOfferingDetails.getLocation());
-        serviceOffering.setCategory(serviceOfferingDetails.getCategory());
-        serviceOffering.setProviderId(serviceOfferingDetails.getProviderId());
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            List<Image> images = uploadImages(dto.getImages());
+            images.forEach(serviceOffering::addImage);
+        }
 
-        return serviceOfferingRepository.save(serviceOffering);
+        return convertToDTO(serviceOfferingRepository.save(serviceOffering));
     }
 
-    /**
-     * 특정 서비스 제공 정보를 삭제합니다.
-     * @param id 삭제할 서비스 제공 ID
-     */
     public void deleteServiceOffering(Long id) {
         serviceOfferingRepository.deleteById(id);
     }
 
-    /**
-     * 특정 카테고리에 속한 서비스 제공 정보를 조회합니다.
-     * @param categoryId 카테고리 ID
-     * @return 해당 카테고리의 서비스 제공 목록
-     */
-    public List<ServiceOffering> getServiceOfferingsByCategory(Long categoryId) {
-        return serviceOfferingRepository.findAll().stream()
-                .filter(offering -> offering.getCategory().getCategoryId().equals(categoryId))
-                .collect(Collectors.toList());
+    public Page<ServiceOfferingDTO> getServiceOfferingsByCategory(Long categoryId, Pageable pageable) {
+        return serviceOfferingRepository.findByCategoryCategoryId(categoryId, pageable).map(this::convertToDTO);
+    }
+
+    private List<Image> uploadImages(List<MultipartFile> files) throws IOException {
+        List<Image> images = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = fileStorageService.storeFile(file);
+            Image image = new Image();
+            image.setFileName(fileName);
+            image.setFilePath(fileStorageService.getFileStorageLocation().resolve(fileName).toString());
+            image.setFileType(file.getContentType());
+            image.setFileSize((int) file.getSize());
+            image.setImageType(Image.ImageType.SERVICE_OFFERING);
+            images.add(imageRepository.save(image));
+        }
+        return images;
+    }
+
+    private ServiceOfferingDTO convertToDTO(ServiceOffering serviceOffering) {
+        ServiceOfferingDTO dto = new ServiceOfferingDTO();
+        dto.setId(serviceOffering.getId());
+        dto.setTitle(serviceOffering.getTitle());
+        dto.setDescription(serviceOffering.getDescription());
+        dto.setPriceRange(serviceOffering.getPriceRange());
+        dto.setLocation(serviceOffering.getLocation());
+        dto.setCategoryId(serviceOffering.getCategory().getCategoryId());
+        dto.setProviderId(serviceOffering.getProviderId());
+        return dto;
+    }
+
+    private ServiceOffering convertToEntity(ServiceOfferingDTO dto) {
+        ServiceOffering serviceOffering = new ServiceOffering();
+        updateServiceOfferingFromDTO(serviceOffering, dto);
+        return serviceOffering;
+    }
+
+    private void updateServiceOfferingFromDTO(ServiceOffering serviceOffering, ServiceOfferingDTO dto) {
+        serviceOffering.setTitle(dto.getTitle());
+        serviceOffering.setDescription(dto.getDescription());
+        serviceOffering.setPriceRange(dto.getPriceRange());
+        serviceOffering.setLocation(dto.getLocation());
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        serviceOffering.setCategory(category);
+        serviceOffering.setProviderId(dto.getProviderId());
     }
 }

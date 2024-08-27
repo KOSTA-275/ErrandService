@@ -1,18 +1,17 @@
 package com.dowadream.errand_service.controller;
 
-import com.dowadream.errand_service.entity.ServiceOffering;
+import com.dowadream.errand_service.dto.ServiceOfferingDTO;
 import com.dowadream.errand_service.service.ServiceOfferingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
-/**
- * 서비스 제공 관련 API 엔드포인트를 제공하는 컨트롤러 클래스입니다.
- */
 @RestController
-@RequestMapping("/api/service-offerings")
+@RequestMapping("/errandservice/service-offerings")
 public class ServiceOfferingController {
 
     private final ServiceOfferingService serviceOfferingService;
@@ -22,67 +21,46 @@ public class ServiceOfferingController {
         this.serviceOfferingService = serviceOfferingService;
     }
 
-    /**
-     * 모든 서비스 제공 정보를 조회합니다.
-     * @return 전체 서비스 제공 목록
-     */
     @GetMapping
-    public List<ServiceOffering> getAllServiceOfferings() {
-        return serviceOfferingService.getAllServiceOfferings();
+    public Page<ServiceOfferingDTO> getAllServiceOfferings(Pageable pageable) {
+        return serviceOfferingService.getAllServiceOfferings(pageable);
     }
 
-    /**
-     * 특정 ID의 서비스 제공 정보를 조회합니다.
-     * @param id 서비스 제공 ID
-     * @return 조회된 서비스 제공 정보
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceOffering> getServiceOfferingById(@PathVariable Long id) {
+    public ResponseEntity<ServiceOfferingDTO> getServiceOfferingById(@PathVariable Long id) {
         return serviceOfferingService.getServiceOfferingById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * 새로운 서비스 제공 정보를 생성합니다.
-     * @param serviceOffering 생성할 서비스 제공 정보
-     * @return 생성된 서비스 제공 정보
-     */
     @PostMapping
-    public ServiceOffering createServiceOffering(@RequestBody ServiceOffering serviceOffering) {
-        return serviceOfferingService.createServiceOffering(serviceOffering);
+    public ResponseEntity<ServiceOfferingDTO> createServiceOffering(@ModelAttribute ServiceOfferingDTO serviceOfferingDTO) {
+        try {
+            ServiceOfferingDTO createdOffering = serviceOfferingService.createServiceOffering(serviceOfferingDTO);
+            return ResponseEntity.ok(createdOffering);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    /**
-     * 기존 서비스 제공 정보를 수정합니다.
-     * @param id 수정할 서비스 제공 ID
-     * @param serviceOfferingDetails 수정할 서비스 제공 정보
-     * @return 수정된 서비스 제공 정보
-     */
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceOffering> updateServiceOffering(@PathVariable Long id, @RequestBody ServiceOffering serviceOfferingDetails) {
-        ServiceOffering updatedServiceOffering = serviceOfferingService.updateServiceOffering(id, serviceOfferingDetails);
-        return ResponseEntity.ok(updatedServiceOffering);
+    public ResponseEntity<ServiceOfferingDTO> updateServiceOffering(@PathVariable Long id, @ModelAttribute ServiceOfferingDTO serviceOfferingDTO) {
+        try {
+            ServiceOfferingDTO updatedOffering = serviceOfferingService.updateServiceOffering(id, serviceOfferingDTO);
+            return ResponseEntity.ok(updatedOffering);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    /**
-     * 특정 서비스 제공 정보를 삭제합니다.
-     * @param id 삭제할 서비스 제공 ID
-     * @return 응답 엔티티
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteServiceOffering(@PathVariable Long id) {
         serviceOfferingService.deleteServiceOffering(id);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 특정 카테고리에 속한 서비스 제공 정보를 조회합니다.
-     * @param categoryId 카테고리 ID
-     * @return 해당 카테고리의 서비스 제공 목록
-     */
     @GetMapping("/category/{categoryId}")
-    public List<ServiceOffering> getServiceOfferingsByCategory(@PathVariable Long categoryId) {
-        return serviceOfferingService.getServiceOfferingsByCategory(categoryId);
+    public Page<ServiceOfferingDTO> getServiceOfferingsByCategory(@PathVariable Long categoryId, Pageable pageable) {
+        return serviceOfferingService.getServiceOfferingsByCategory(categoryId, pageable);
     }
 }

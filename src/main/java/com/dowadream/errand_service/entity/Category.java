@@ -1,14 +1,18 @@
 package com.dowadream.errand_service.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "categories")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"parentCategory", "subCategories", "serviceOfferings", "errands", "image"})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
@@ -33,4 +37,15 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     private List<Errand> errands = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
+    public void setImage(Image image) {
+        if (image != null) {
+            image.setImageType(Image.ImageType.CATEGORY);
+        }
+        this.image = image;
+    }
 }

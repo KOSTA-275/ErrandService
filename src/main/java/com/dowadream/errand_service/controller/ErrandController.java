@@ -1,17 +1,17 @@
 package com.dowadream.errand_service.controller;
 
 import com.dowadream.errand_service.dto.ErrandDTO;
-import com.dowadream.errand_service.entity.Errand;
 import com.dowadream.errand_service.service.ErrandService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/errands")
+@RequestMapping("/errandservice/errands")
 public class ErrandController {
 
     private final ErrandService errandService;
@@ -22,27 +22,35 @@ public class ErrandController {
     }
 
     @GetMapping
-    public List<Errand> getAllErrands() {
-        return errandService.getAllErrands();
+    public Page<ErrandDTO> getAllErrands(Pageable pageable) {
+        return errandService.getAllErrands(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Errand> getErrandById(@PathVariable Long id) {
+    public ResponseEntity<ErrandDTO> getErrandById(@PathVariable Long id) {
         return errandService.getErrandById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Errand> createErrand(@ModelAttribute ErrandDTO errandDTO) throws IOException {
-        Errand createdErrand = errandService.createErrand(errandDTO);
-        return ResponseEntity.ok(createdErrand);
+    public ResponseEntity<ErrandDTO> createErrand(@ModelAttribute ErrandDTO errandDTO) {
+        try {
+            ErrandDTO createdErrand = errandService.createErrand(errandDTO);
+            return ResponseEntity.ok(createdErrand);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Errand> updateErrand(@PathVariable Long id, @ModelAttribute ErrandDTO errandDTO) throws IOException {
-        Errand updatedErrand = errandService.updateErrand(id, errandDTO);
-        return ResponseEntity.ok(updatedErrand);
+    public ResponseEntity<ErrandDTO> updateErrand(@PathVariable Long id, @ModelAttribute ErrandDTO errandDTO) {
+        try {
+            ErrandDTO updatedErrand = errandService.updateErrand(id, errandDTO);
+            return ResponseEntity.ok(updatedErrand);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -52,7 +60,7 @@ public class ErrandController {
     }
 
     @GetMapping("/category/{categoryId}")
-    public List<Errand> getErrandsByCategory(@PathVariable Long categoryId) {
-        return errandService.getErrandsByCategory(categoryId);
+    public Page<ErrandDTO> getErrandsByCategory(@PathVariable Long categoryId, Pageable pageable) {
+        return errandService.getErrandsByCategory(categoryId, pageable);
     }
 }

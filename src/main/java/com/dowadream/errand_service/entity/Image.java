@@ -28,15 +28,18 @@ public class Image {
     private LocalDateTime uploadDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "RELATED_TYPE", nullable = false)
-    private RelatedType relatedType = RelatedType.ERRAND;  // 기본값 설정
-
-    public enum RelatedType {
-        ERRAND, SERVICE_OFFERING
-    }
+    @Column(name = "IMAGE_TYPE", nullable = false)
+    private ImageType imageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "errand_seq", nullable = false)
+    @JoinColumn(name = "errand_seq")
     private Errand errand;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_offering_id")
+    private ServiceOffering serviceOffering;
+
+    public enum ImageType {
+        ERRAND_REQUEST, SERVICE_OFFERING, CATEGORY
+    }
 }

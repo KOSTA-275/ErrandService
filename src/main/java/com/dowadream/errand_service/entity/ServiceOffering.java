@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "service_offerings")
@@ -32,4 +34,18 @@ public class ServiceOffering {
 
     @Column(nullable = false)
     private Long providerId;
+
+    @OneToMany(mappedBy = "serviceOffering", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
+    public void addImage(Image image) {
+        images.add(image);
+        image.setServiceOffering(this);
+        image.setImageType(Image.ImageType.SERVICE_OFFERING);
+    }
+
+    public void removeImage(Image image) {
+        images.remove(image);
+        image.setServiceOffering(null);
+    }
 }

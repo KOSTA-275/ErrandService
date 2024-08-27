@@ -51,6 +51,7 @@ public class Errand {
     public void addImage(Image image) {
         images.add(image);
         image.setErrand(this);
+        image.setImageType(Image.ImageType.ERRAND_REQUEST);
     }
 
     public void removeImage(Image image) {

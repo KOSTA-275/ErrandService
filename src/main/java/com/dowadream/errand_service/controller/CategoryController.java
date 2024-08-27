@@ -1,18 +1,16 @@
 package com.dowadream.errand_service.controller;
 
-import com.dowadream.errand_service.entity.Category;
+import com.dowadream.errand_service.dto.CategoryDTO;
 import com.dowadream.errand_service.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
-/**
- * 카테고리 관련 API 엔드포인트를 제공하는 컨트롤러 클래스입니다.
- */
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/errandservice/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -22,66 +20,46 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    /**
-     * 모든 카테고리를 조회합니다.
-     * @return 전체 카테고리 목록
-     */
     @GetMapping
-    public List<Category> getAllCategories() {
+    public List<CategoryDTO> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
-    /**
-     * 특정 ID의 카테고리를 조회합니다.
-     * @param id 카테고리 ID
-     * @return 조회된 카테고리 정보
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * 새로운 카테고리를 생성합니다.
-     * @param category 생성할 카테고리 정보
-     * @return 생성된 카테고리
-     */
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return categoryService.createCategory(category);
+    public ResponseEntity<CategoryDTO> createCategory(@ModelAttribute CategoryDTO categoryDTO) {
+        try {
+            CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
+            return ResponseEntity.ok(createdCategory);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    /**
-     * 기존 카테고리를 수정합니다.
-     * @param id 수정할 카테고리 ID
-     * @param categoryDetails 수정할 카테고리 정보
-     * @return 수정된 카테고리
-     */
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
-        Category updatedCategory = categoryService.updateCategory(id, categoryDetails);
-        return ResponseEntity.ok(updatedCategory);
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @ModelAttribute CategoryDTO categoryDTO) {
+        try {
+            CategoryDTO updatedCategory = categoryService.updateCategory(id, categoryDTO);
+            return ResponseEntity.ok(updatedCategory);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    /**
-     * 특정 카테고리를 삭제합니다.
-     * @param id 삭제할 카테고리 ID
-     * @return 응답 엔티티
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 카테고리 트리 구조를 조회합니다.
-     * @return 카테고리 트리 구조
-     */
     @GetMapping("/tree")
-    public List<Category> getCategoryTree() {
+    public List<CategoryDTO> getCategoryTree() {
         return categoryService.getCategoryTree();
     }
 }
