@@ -4,6 +4,7 @@ import com.dowadream.errand_service.dto.ErrandDTO;
 import com.dowadream.errand_service.entity.Category;
 import com.dowadream.errand_service.entity.Errand;
 import com.dowadream.errand_service.entity.Image;
+import com.dowadream.errand_service.exception.ResourceNotFoundException;
 import com.dowadream.errand_service.repository.CategoryRepository;
 import com.dowadream.errand_service.repository.ErrandRepository;
 import com.dowadream.errand_service.repository.ImageRepository;
@@ -59,7 +60,7 @@ public class ErrandService {
 
     public ErrandDTO updateErrand(Long id, ErrandDTO errandDTO) throws IOException {
         Errand errand = errandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Errand not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Errand not found with id: " + id));
         updateErrandFromDTO(errand, errandDTO);
 
         if (errandDTO.getImages() != null && !errandDTO.getImages().isEmpty()) {
@@ -76,6 +77,17 @@ public class ErrandService {
 
     public Page<ErrandDTO> getErrandsByCategory(Long categoryId, Pageable pageable) {
         return errandRepository.findByCategoryCategoryId(categoryId, pageable).map(this::convertToDTO);
+    }
+
+    public Page<ErrandDTO> getFilteredErrands(String location, Long categoryId, String sortBy, Pageable pageable) {
+        return errandRepository.findErrandsByFilters(location, categoryId, sortBy, pageable).map(this::convertToDTO);
+    }
+
+    public ErrandDTO updateErrandStatus(Long id, Errand.ErrandStatus newStatus) {
+        Errand errand = errandRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Errand not found with id: " + id));
+        errand.setStatus(newStatus);
+        return convertToDTO(errandRepository.save(errand));
     }
 
     private List<Image> uploadImages(List<MultipartFile> files) throws IOException {
@@ -100,10 +112,14 @@ public class ErrandService {
         dto.setDescription(errand.getDescription());
         dto.setRequesterSeq(errand.getRequesterSeq());
         dto.setRunnerSeq(errand.getRunnerSeq());
-        dto.setStatus(errand.getStatus());
+        dto.setStatus(errand.getStatus().name());
         dto.setCategoryId(errand.getCategory().getCategoryId());
         dto.setCreatedDate(errand.getCreatedDate());
         dto.setUpdatedDate(errand.getUpdatedDate());
+        dto.setLocation(errand.getLocation());
+        dto.setPrice(errand.getPrice());
+        dto.setEstimatedTime(errand.getEstimatedTime());
+        dto.setDeadline(errand.getDeadline());
         return dto;
     }
 
@@ -118,9 +134,13 @@ public class ErrandService {
         errand.setDescription(dto.getDescription());
         errand.setRequesterSeq(dto.getRequesterSeq());
         errand.setRunnerSeq(dto.getRunnerSeq());
-        errand.setStatus(dto.getStatus());
+        errand.setStatus(Errand.ErrandStatus.valueOf(dto.getStatus()));
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId()));
         errand.setCategory(category);
+        errand.setLocation(dto.getLocation());
+        errand.setPrice(dto.getPrice());
+        errand.setEstimatedTime(dto.getEstimatedTime());
+        errand.setDeadline(dto.getDeadline());
     }
 }

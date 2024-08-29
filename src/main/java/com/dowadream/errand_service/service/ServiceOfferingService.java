@@ -4,6 +4,7 @@ import com.dowadream.errand_service.dto.ServiceOfferingDTO;
 import com.dowadream.errand_service.entity.Category;
 import com.dowadream.errand_service.entity.Image;
 import com.dowadream.errand_service.entity.ServiceOffering;
+import com.dowadream.errand_service.exception.ResourceNotFoundException;
 import com.dowadream.errand_service.repository.CategoryRepository;
 import com.dowadream.errand_service.repository.ImageRepository;
 import com.dowadream.errand_service.repository.ServiceOfferingRepository;
@@ -60,7 +61,7 @@ public class ServiceOfferingService {
 
     public ServiceOfferingDTO updateServiceOffering(Long id, ServiceOfferingDTO dto) throws IOException {
         ServiceOffering serviceOffering = serviceOfferingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service offering not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Service offering not found with id: " + id));
         updateServiceOfferingFromDTO(serviceOffering, dto);
 
         if (dto.getImages() != null && !dto.getImages().isEmpty()) {
@@ -77,6 +78,11 @@ public class ServiceOfferingService {
 
     public Page<ServiceOfferingDTO> getServiceOfferingsByCategory(Long categoryId, Pageable pageable) {
         return serviceOfferingRepository.findByCategoryCategoryId(categoryId, pageable).map(this::convertToDTO);
+    }
+
+    public Page<ServiceOfferingDTO> getFilteredServiceOfferings(String location, Long categoryId, String sortBy, Pageable pageable) {
+        return serviceOfferingRepository.findServiceOfferingsByFilters(location, categoryId, sortBy, pageable)
+                .map(this::convertToDTO);
     }
 
     private List<Image> uploadImages(List<MultipartFile> files) throws IOException {
@@ -103,6 +109,16 @@ public class ServiceOfferingService {
         dto.setLocation(serviceOffering.getLocation());
         dto.setCategoryId(serviceOffering.getCategory().getCategoryId());
         dto.setProviderId(serviceOffering.getProviderId());
+        dto.setCreatedDate(serviceOffering.getCreatedDate());
+        dto.setCompletedTasks(serviceOffering.getCompletedTasks());
+        // 평균 평점 계산
+        if (!serviceOffering.getReviews().isEmpty()) {
+            double avgRating = serviceOffering.getReviews().stream()
+                    .mapToInt(review -> review.getRating())
+                    .average()
+                    .orElse(0.0);
+            dto.setAverageRating(avgRating);
+        }
         return dto;
     }
 
@@ -118,8 +134,15 @@ public class ServiceOfferingService {
         serviceOffering.setPriceRange(dto.getPriceRange());
         serviceOffering.setLocation(dto.getLocation());
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId()));
         serviceOffering.setCategory(category);
         serviceOffering.setProviderId(dto.getProviderId());
+    }
+
+    public void incrementCompletedTasks(Long serviceOfferingId) {
+        ServiceOffering serviceOffering = serviceOfferingRepository.findById(serviceOfferingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service offering not found with id: " + serviceOfferingId));
+        serviceOffering.incrementCompletedTasks();
+        serviceOfferingRepository.save(serviceOffering);
     }
 }

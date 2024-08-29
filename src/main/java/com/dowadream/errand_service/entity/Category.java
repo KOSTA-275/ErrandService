@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "categories")
 @Getter
 @Setter
-@ToString(exclude = {"parentCategory", "subCategories", "serviceOfferings", "errands", "image"})
+@ToString(exclude = {"serviceOfferings", "errands", "image"})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
@@ -24,13 +24,6 @@ public class Category {
 
     @Column(length = 255)
     private String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_category_id")
-    private Category parentCategory;
-
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
-    private List<Category> subCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "category")
     private List<ServiceOffering> serviceOfferings = new ArrayList<>();

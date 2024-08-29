@@ -63,4 +63,13 @@ public class ServiceOfferingController {
     public Page<ServiceOfferingDTO> getServiceOfferingsByCategory(@PathVariable Long categoryId, Pageable pageable) {
         return serviceOfferingService.getServiceOfferingsByCategory(categoryId, pageable);
     }
+
+    @GetMapping("/filter")
+    public Page<ServiceOfferingDTO> getFilteredServiceOfferings(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String sortBy,
+            Pageable pageable) {
+        return serviceOfferingService.getFilteredServiceOfferings(location, categoryId, sortBy, pageable);
+    }
 }

@@ -58,8 +58,4 @@ public class CategoryController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/tree")
-    public List<CategoryDTO> getCategoryTree() {
-        return categoryService.getCategoryTree();
-    }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,13 @@ public class Errand {
     @Column(name = "runner_seq")
     private Long runnerSeq;
 
-    @Column(nullable = false, length = 20)
-    private String status;
+    public enum ErrandStatus {
+        REQUESTED, IN_PROGRESS, COMPLETED, CANCELLED
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ErrandStatus status = ErrandStatus.REQUESTED;
 
     @CreationTimestamp
     @Column(name = "created_date", nullable = false, updatable = false)
@@ -48,6 +54,21 @@ public class Errand {
     @OneToMany(mappedBy = "errand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Column(nullable = false)
+    private Integer estimatedTime;
+
+    @Column(nullable = false)
+    private LocalDateTime deadline;
+
+    @OneToMany(mappedBy = "errand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
     public void addImage(Image image) {
         images.add(image);
         image.setErrand(this);
@@ -57,5 +78,15 @@ public class Errand {
     public void removeImage(Image image) {
         images.remove(image);
         image.setErrand(null);
+    }
+
+    public void addReview(Review review) {
+        reviews.add(review);
+        review.setErrand(this);
+    }
+
+    public void removeReview(Review review) {
+        reviews.remove(review);
+        review.setErrand(null);
     }
 }

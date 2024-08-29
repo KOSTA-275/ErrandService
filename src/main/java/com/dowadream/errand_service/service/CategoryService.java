@@ -64,13 +64,6 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    public List<CategoryDTO> getCategoryTree() {
-        List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
-        return rootCategories.stream()
-                .map(this::convertToTreeDTO)
-                .collect(Collectors.toList());
-    }
-
     private Image uploadImage(MultipartFile file) throws IOException {
         String fileName = fileStorageService.storeFile(file);
         Image image = new Image();
@@ -87,24 +80,9 @@ public class CategoryService {
         dto.setCategoryId(category.getCategoryId());
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
-        if (category.getParentCategory() != null) {
-            dto.setParentCategoryId(category.getParentCategory().getCategoryId());
-        }
-        dto.setSubCategoryIds(category.getSubCategories().stream()
-                .map(Category::getCategoryId)
-                .collect(Collectors.toList()));
         if (category.getImage() != null) {
             dto.setImagePath(category.getImage().getFilePath());
         }
-        return dto;
-    }
-
-    private CategoryDTO convertToTreeDTO(Category category) {
-        CategoryDTO dto = convertToDTO(category);
-        dto.setSubCategoryIds(category.getSubCategories().stream()
-                .map(this::convertToTreeDTO)
-                .map(CategoryDTO::getCategoryId)
-                .collect(Collectors.toList()));
         return dto;
     }
 
@@ -117,10 +95,5 @@ public class CategoryService {
     private void updateCategoryFromDTO(Category category, CategoryDTO dto) {
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
-        if (dto.getParentCategoryId() != null) {
-            Category parentCategory = categoryRepository.findById(dto.getParentCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Parent category not found"));
-            category.setParentCategory(parentCategory);
-        }
     }
 }

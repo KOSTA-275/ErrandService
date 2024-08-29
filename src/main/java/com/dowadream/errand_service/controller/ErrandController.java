@@ -1,6 +1,7 @@
 package com.dowadream.errand_service.controller;
 
 import com.dowadream.errand_service.dto.ErrandDTO;
+import com.dowadream.errand_service.entity.Errand;
 import com.dowadream.errand_service.service.ErrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -62,5 +63,20 @@ public class ErrandController {
     @GetMapping("/category/{categoryId}")
     public Page<ErrandDTO> getErrandsByCategory(@PathVariable Long categoryId, Pageable pageable) {
         return errandService.getErrandsByCategory(categoryId, pageable);
+    }
+
+    @GetMapping("/filter")
+    public Page<ErrandDTO> getFilteredErrands(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String sortBy,
+            Pageable pageable) {
+        return errandService.getFilteredErrands(location, categoryId, sortBy, pageable);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ErrandDTO> updateErrandStatus(@PathVariable Long id, @RequestParam Errand.ErrandStatus status) {
+        ErrandDTO updatedErrand = errandService.updateErrandStatus(id, status);
+        return ResponseEntity.ok(updatedErrand);
     }
 }
