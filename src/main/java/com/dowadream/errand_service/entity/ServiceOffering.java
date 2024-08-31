@@ -1,7 +1,8 @@
 package com.dowadream.errand_service.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -11,7 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "service_offerings")
-@Data
+@Getter
+@Setter
 public class ServiceOffering {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_offering_seq")

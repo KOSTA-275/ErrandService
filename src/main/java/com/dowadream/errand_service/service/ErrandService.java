@@ -134,10 +134,25 @@ public class ErrandService {
         errand.setDescription(dto.getDescription());
         errand.setRequesterSeq(dto.getRequesterSeq());
         errand.setRunnerSeq(dto.getRunnerSeq());
-        errand.setStatus(Errand.ErrandStatus.valueOf(dto.getStatus()));
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId()));
-        errand.setCategory(category);
+
+        // Status 처리 로직 추가
+        if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
+            try {
+                errand.setStatus(Errand.ErrandStatus.valueOf(dto.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                // 유효하지 않은 상태값 처리
+                errand.setStatus(Errand.ErrandStatus.REQUESTED); // 기본값 설정
+            }
+        } else {
+            errand.setStatus(Errand.ErrandStatus.REQUESTED); // 상태가 제공되지 않은 경우 기본값 설정
+        }
+
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId()));
+            errand.setCategory(category);
+        }
+
         errand.setLocation(dto.getLocation());
         errand.setPrice(dto.getPrice());
         errand.setEstimatedTime(dto.getEstimatedTime());

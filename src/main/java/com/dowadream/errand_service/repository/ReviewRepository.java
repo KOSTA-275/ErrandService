@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByErrandErrandSeq(Long errandSeq);
+    List<Review> findByServiceOfferingId(Long serviceOfferingId);
 }

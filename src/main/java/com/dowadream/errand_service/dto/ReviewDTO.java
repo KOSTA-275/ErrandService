@@ -7,11 +7,19 @@ import java.time.LocalDateTime;
 public class ReviewDTO {
     private Long id;
     private Long errandId;
+    private Long serviceOfferingId;
     private Long reviewerId;
     private Integer rating;
-    private String comment;
+    private String comments;
     private LocalDateTime createdDate;
 
-    //필요에 따라 추가 메서드 구현
+    // Utility method to check if this review is for an Errand
+    public boolean isErrandReview() {
+        return errandId != null;
+    }
 
+    // Utility method to check if this review is for a ServiceOffering
+    public boolean isServiceOfferingReview() {
+        return serviceOfferingId != null;
+    }
 }

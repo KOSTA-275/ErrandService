@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심부름 서비스 테스트 페이지</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        h1, h2 { color: #333; }
+        form { margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        #result { border: 1px solid #ddd; padding: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<h1>심부름 서비스 테스트 페이지</h1>
+
+<h2>카테고리 조회</h2>
+<button onclick="getCategories()">카테고리 조회</button>
+
+<h2>카테고리 생성</h2>
+<form id="categoryForm">
+    <input type="text" id="categoryName" placeholder="카테고리 이름" required>
+    <textarea id="categoryDescription" placeholder="카테고리 설명"></textarea>
+    <input type="file" id="categoryImage" accept="image/*">
+    <button type="button" onclick="createCategory()">카테고리 생성</button>
+</form>
+
+<h2>심부름 조회</h2>
+<button onclick="getErrands()">심부름 조회</button>
+
+<h2>심부름 생성</h2>
+<form id="errandForm">
+    <input type="text" id="errandTitle" placeholder="제목" required>
+    <textarea id="errandDescription" placeholder="설명" required></textarea>
+    <input type="number" id="errandRequesterSeq" placeholder="요청자 ID" required>
+    <input type="number" id="errandCategoryId" placeholder="카테고리 ID" required>
+    <input type="text" id="errandLocation" placeholder="위치" required>
+    <input type="number" id="errandPrice" placeholder="가격" required>
+    <input type="number" id="errandEstimatedTime" placeholder="예상 소요 시간(분)" required>
+    <input type="datetime-local" id="errandDeadline" required>
+    <input type="file" id="errandImages" accept="image/*" multiple>
+    <button type="button" onclick="createErrand()">심부름 생성</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    const API_URL = 'http://localhost:8090/errandservice';
+
+    async function getCategories() {
+        try {
+            const response = await fetch(`${API_URL}/categories`);
+            const data = await response.json();
+            document.getElementById('result').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        }
+    }
+
+    async function createCategory() {
+        const formData = new FormData();
+        formData.append('name', document.getElementById('categoryName').value);
+        formData.append('description', document.getElementById('categoryDescription').value);
+        const imageFile = document.getElementById('categoryImage').files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/categories`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('result').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        }
+    }
+
+    async function getErrands() {
+        try {
+            const response = await fetch(`${API_URL}/errands`);
+            const data = await response.json();
+            document.getElementById('result').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        }
+    }
+
+    async function createErrand() {
+        const formData = new FormData();
+        formData.append('title', document.getElementById('errandTitle').value);
+        formData.append('description', document.getElementById('errandDescription').value);
+        formData.append('requesterSeq', document.getElementById('errandRequesterSeq').value);
+        formData.append('categoryId', document.getElementById('errandCategoryId').value);
+        formData.append('location', document.getElementById('errandLocation').value);
+        formData.append('price', document.getElementById('errandPrice').value);
+        formData.append('estimatedTime', document.getElementById('errandEstimatedTime').value);
+        formData.append('deadline', document.getElementById('errandDeadline').value);
+
+        const imageFiles = document.getElementById('errandImages').files;
+        for (let i = 0; i < imageFiles.length; i++) {
+            formData.append('images', imageFiles[i]);
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/errands`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('result').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        }
+    }
+</script>
+</body>
+</html>
