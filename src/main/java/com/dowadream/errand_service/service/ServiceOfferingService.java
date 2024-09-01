@@ -4,6 +4,7 @@ import com.dowadream.errand_service.dto.ServiceOfferingDTO;
 import com.dowadream.errand_service.entity.Category;
 import com.dowadream.errand_service.entity.Image;
 import com.dowadream.errand_service.entity.ServiceOffering;
+import com.dowadream.errand_service.entity.Review;
 import com.dowadream.errand_service.exception.BadRequestException;
 import com.dowadream.errand_service.exception.ResourceNotFoundException;
 import com.dowadream.errand_service.repository.CategoryRepository;
@@ -223,5 +224,44 @@ public class ServiceOfferingService {
             uploadedImages.add(image);
         }
         return uploadedImages;
+    }
+
+    /**
+     * 필터를 적용하여 서비스 제공을 조회합니다.
+     *
+     * @param location 위치
+     * @param categoryId 카테고리 ID
+     * @param sortBy 정렬 기준
+     * @param pageable 페이징 정보
+     * @return 페이징된 서비스 제공 DTO 목록
+     */
+    public Page<ServiceOfferingDTO> getFilteredServiceOfferings(String location, Long categoryId, String sortBy, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startRow = currentPage * pageSize;
+        int endRow = (currentPage + 1) * pageSize;
+
+        List<ServiceOffering> serviceOfferings = serviceOfferingRepository.findServiceOfferingsByFilters(
+                location, categoryId, sortBy, startRow, endRow);
+        long total = serviceOfferingRepository.countServiceOfferingsByFilters(location, categoryId);
+
+        List<ServiceOfferingDTO> dtoList = serviceOfferings.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, total);
+    }
+
+    /**
+     * ID로 서비스 제공을 조회합니다.
+     *
+     * @param id 서비스 제공 ID
+     * @return 서비스 제공 DTO
+     * @throws ResourceNotFoundException 해당 ID의 서비스 제공이 없을 경우
+     */
+    public ServiceOfferingDTO getServiceOfferingById(Long id) {
+        ServiceOffering serviceOffering = serviceOfferingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("서비스 제공을 찾을 수 없습니다. ID: " + id));
+        return convertToDTO(serviceOffering);
     }
 }
