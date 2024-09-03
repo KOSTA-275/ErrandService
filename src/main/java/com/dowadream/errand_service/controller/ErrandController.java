@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * 심부름 관련 HTTP 요청 처리
  */
 @RestController
-@RequestMapping("/errandservice/errands")
+@RequestMapping("/ErrandService/errands")
 public class ErrandController {
 
     private final ErrandService errandService;

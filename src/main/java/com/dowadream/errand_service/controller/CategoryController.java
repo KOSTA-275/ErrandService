@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/errandservice/categories")
+@RequestMapping("/ErrandService/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;

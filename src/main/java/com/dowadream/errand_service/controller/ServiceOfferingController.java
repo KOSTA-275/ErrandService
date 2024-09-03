@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * 서비스 제공 관련 HTTP 요청을 처리하는 컨트롤러 클래스
  */
 @RestController
-@RequestMapping("/errandservice/service-offerings")
+@RequestMapping("/ErrandService/service-offerings")
 public class ServiceOfferingController {
 
     private final ServiceOfferingService serviceOfferingService;
