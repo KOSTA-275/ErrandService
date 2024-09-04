@@ -12,13 +12,15 @@ import java.util.List;
  */
 @Data
 public class ErrandDTO {
-    private Long errandSeq;          //심부름 고유 번호
-    private String title;            //심부름 제목
-    private String description;      //심부름 설명
-    private Long requesterSeq;       //요청자 고유 번호
-    private Long runnerSeq;          //수행자 고유 번호
-    private String status;           //심부름 상태
-    private Long categoryId;         //카테고리 ID
+    private Long errandSeq;             //심부름 고유 번호
+    private String title;               //심부름 제목
+    private String description;         //심부름 설명
+    private Long requesterSeq;          //요청자 고유 번호
+    private Long runnerSeq;             //수행자 고유 번호
+    private String status;              //심부름 상태
+    private Long categoryId;            //카테고리 ID
+    private String requesterNickname;   //요청자 닉네임
+    private String runnerNickname;      //수행자 닉네임
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdDate; //생성 일시

@@ -31,6 +31,12 @@ public class Errand {
     @Column(name = "runner_seq")
     private Long runnerSeq;
 
+    @Column(name = "requester_nickname")
+    private String requesterNickname;
+
+    @Column(name = "runner_nickname")
+    private String runnerNickname;
+
     public enum ErrandStatus {
         REQUESTED, IN_PROGRESS, COMPLETED, CANCELLED
     }

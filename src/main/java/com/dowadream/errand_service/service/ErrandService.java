@@ -180,6 +180,8 @@ public class ErrandService {
         dto.setPrice(errand.getPrice());
         dto.setEstimatedTime(errand.getEstimatedTime());
         dto.setDeadline(errand.getDeadline());
+        dto.setRequesterNickname(errand.getRequesterNickname());
+        dto.setRunnerNickname(errand.getRunnerNickname());
         return dto;
     }
 
@@ -200,6 +202,8 @@ public class ErrandService {
         errand.setDescription(dto.getDescription());
         errand.setRequesterSeq(dto.getRequesterSeq());
         errand.setRunnerSeq(dto.getRunnerSeq());
+        errand.setRequesterNickname(dto.getRequesterNickname());
+        errand.setRunnerNickname(dto.getRunnerNickname());
 
         if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
             try {
