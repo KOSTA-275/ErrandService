@@ -4,6 +4,7 @@ import com.dowadream.errand_service.dto.ErrandDTO;
 import com.dowadream.errand_service.entity.Category;
 import com.dowadream.errand_service.entity.Errand;
 import com.dowadream.errand_service.exception.ResourceNotFoundException;
+import com.dowadream.errand_service.exception.BadRequestException;
 import com.dowadream.errand_service.repository.CategoryRepository;
 import com.dowadream.errand_service.repository.ErrandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,13 +153,21 @@ public class ErrandService {
      * 심부름의 상태 업데이트
      *
      * @param id 심부름 ID
-     * @param newStatus 새로운 상태
-     * @return 업데이트된 심부름 DTO
+     * @param errandDTO
+     * @return
      */
-    public ErrandDTO updateErrandStatus(Long id, Errand.ErrandStatus newStatus) {
+    public ErrandDTO acceptErrand(Long id, ErrandDTO errandDTO) {
         Errand errand = errandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Errand not found with id: " + id));
-        errand.setStatus(newStatus);
+
+        if (errand.getStatus() != Errand.ErrandStatus.REQUESTED) {
+            throw new BadRequestException("This errand is not available for acceptance.");
+        }
+
+        errand.setStatus(Errand.ErrandStatus.IN_PROGRESS);
+        errand.setRunnerSeq(errandDTO.getRunnerSeq());
+        errand.setRunnerNickname(errandDTO.getRunnerNickname());
+
         return convertToDTO(errandRepository.save(errand));
     }
 

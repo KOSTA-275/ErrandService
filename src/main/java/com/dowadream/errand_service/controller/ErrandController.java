@@ -116,15 +116,15 @@ public class ErrandController {
     }
 
     /**
-     * 심부름 상태 업데이트
+     * 심부름 수락
      *
      * @param id 심부름 ID
-     * @param status 새로운 상태
-     * @return 업데이트된 심부름 DTO
+     * @param errandDTO
+     * @return
      */
-    @PutMapping("/{id}/status")
-    public ResponseEntity<ErrandDTO> updateErrandStatus(@PathVariable Long id, @RequestParam Errand.ErrandStatus status) {
-        ErrandDTO updatedErrand = errandService.updateErrandStatus(id, status);
+    @PutMapping("/{id}/accept")
+    public ResponseEntity<ErrandDTO> acceptErrand(@PathVariable Long id, @RequestBody ErrandDTO errandDTO) {
+        ErrandDTO updatedErrand = errandService.acceptErrand(id, errandDTO);
         return ResponseEntity.ok(updatedErrand);
     }
 }
