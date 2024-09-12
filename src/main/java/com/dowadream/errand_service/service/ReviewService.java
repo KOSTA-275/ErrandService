@@ -26,6 +26,12 @@ public class ReviewService {
     private final ErrandRepository errandRepository;
     private final ServiceOfferingRepository serviceOfferingRepository;
 
+    /**
+     * ReviewService 생성자
+     * @param reviewRepository 리뷰 리포지토리
+     * @param errandRepository 심부름 리포지토리
+     * @param serviceOfferingRepository 서비스 제공 리포지토리
+     */
     @Autowired
     public ReviewService(ReviewRepository reviewRepository,
                          ErrandRepository errandRepository,
@@ -37,7 +43,6 @@ public class ReviewService {
 
     /**
      * 새로운 리뷰를 생성합니다.
-     *
      * @param reviewDTO 리뷰 DTO
      * @return 생성된 리뷰 DTO
      */
@@ -65,7 +70,6 @@ public class ReviewService {
 
     /**
      * 특정 심부름에 대한 모든 리뷰를 조회합니다.
-     *
      * @param errandId 심부름 ID
      * @return 리뷰 DTO 목록
      */
@@ -78,7 +82,6 @@ public class ReviewService {
 
     /**
      * 특정 서비스 제공에 대한 모든 리뷰를 조회합니다.
-     *
      * @param serviceOfferingId 서비스 제공 ID
      * @return 리뷰 DTO 목록
      */
@@ -91,7 +94,6 @@ public class ReviewService {
 
     /**
      * 특정 리뷰를 ID로 조회합니다.
-     *
      * @param id 리뷰 ID
      * @return 리뷰 DTO
      */
@@ -103,7 +105,6 @@ public class ReviewService {
 
     /**
      * 특정 리뷰를 업데이트합니다.
-     *
      * @param id 리뷰 ID
      * @param reviewDTO 업데이트할 리뷰 정보
      * @return 업데이트된 리뷰 DTO
@@ -121,7 +122,6 @@ public class ReviewService {
 
     /**
      * 특정 리뷰를 삭제합니다.
-     *
      * @param id 삭제할 리뷰 ID
      */
     public void deleteReview(Long id) {
@@ -133,7 +133,6 @@ public class ReviewService {
 
     /**
      * 리뷰 엔티티를 DTO로 변환합니다.
-     *
      * @param review 리뷰 엔티티
      * @return 리뷰 DTO
      */

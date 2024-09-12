@@ -17,6 +17,10 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
 
+    /**
+     * ReviewController 생성자
+     * @param reviewService 리뷰 서비스 인스턴스
+     */
     @Autowired
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
@@ -24,7 +28,6 @@ public class ReviewController {
 
     /**
      * 새로운 리뷰를 생성합니다.
-     *
      * @param reviewDTO 리뷰 DTO
      * @return 생성된 리뷰 DTO와 HTTP 상태
      */
@@ -36,7 +39,6 @@ public class ReviewController {
 
     /**
      * 특정 심부름에 대한 모든 리뷰를 조회합니다.
-     *
      * @param errandId 심부름 ID
      * @return 리뷰 DTO 목록과 HTTP 상태
      */
@@ -48,7 +50,6 @@ public class ReviewController {
 
     /**
      * 특정 서비스 제공에 대한 모든 리뷰를 조회합니다.
-     *
      * @param serviceOfferingId 서비스 제공 ID
      * @return 리뷰 DTO 목록과 HTTP 상태
      */
@@ -60,7 +61,6 @@ public class ReviewController {
 
     /**
      * 특정 리뷰를 ID로 조회합니다.
-     *
      * @param id 리뷰 ID
      * @return 리뷰 DTO와 HTTP 상태
      */
@@ -72,7 +72,6 @@ public class ReviewController {
 
     /**
      * 특정 리뷰를 업데이트합니다.
-     *
      * @param id 리뷰 ID
      * @param reviewDTO 업데이트할 리뷰 정보
      * @return 업데이트된 리뷰 DTO와 HTTP 상태
@@ -85,7 +84,6 @@ public class ReviewController {
 
     /**
      * 특정 리뷰를 삭제합니다.
-     *
      * @param id 삭제할 리뷰 ID
      * @return HTTP 상태
      */

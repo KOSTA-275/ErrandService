@@ -11,11 +11,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * 파일 저장 관련 기능을 처리하는 서비스 클래스
+ */
 @Service
 public class FileStorageService {
 
     private final Path fileStorageLocation;
 
+    /**
+     * FileStorageService 생성자
+     * @param uploadDir 파일 업로드 디렉토리 경로
+     */
     public FileStorageService(@Value("${file.upload-dir}") String uploadDir) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
 
@@ -26,6 +33,12 @@ public class FileStorageService {
         }
     }
 
+    /**
+     * 파일을 저장합니다.
+     * @param file 저장할 MultipartFile
+     * @return 저장된 파일명
+     * @throws IOException 파일 저장 중 오류 발생 시
+     */
     public String storeFile(MultipartFile file) throws IOException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -43,6 +56,10 @@ public class FileStorageService {
         }
     }
 
+    /**
+     * 파일 저장 위치를 반환합니다.
+     * @return 파일 저장 위치 경로
+     */
     public Path getFileStorageLocation() {
         return fileStorageLocation;
     }

@@ -10,8 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 심부름 컨트롤러
- * 심부름 관련 HTTP 요청 처리
+ * 심부름 관련 HTTP 요청을 처리하는 컨트롤러 클래스
  */
 @RestController
 @RequestMapping("/ErrandService/errands")
@@ -19,14 +18,17 @@ public class ErrandController {
 
     private final ErrandService errandService;
 
+    /**
+     * ErrandController 생성자
+     * @param errandService 심부름 서비스 인스턴스
+     */
     @Autowired
     public ErrandController(ErrandService errandService) {
         this.errandService = errandService;
     }
 
     /**
-     * 모든 심부름 페이징 조회
-     *
+     * 모든 심부름을 페이징하여 조회합니다.
      * @param pageable 페이징 정보
      * @return 페이징된 심부름 DTO 목록
      */
@@ -36,10 +38,9 @@ public class ErrandController {
     }
 
     /**
-     * ID로 심부름 조회
-     *
+     * 특정 ID의 심부름을 조회합니다.
      * @param id 심부름 ID
-     * @return 심부름 DTO
+     * @return 심부름 DTO와 HTTP 상태
      */
     @GetMapping("/{id}")
     public ResponseEntity<ErrandDTO> getErrandById(@PathVariable Long id) {
@@ -49,10 +50,9 @@ public class ErrandController {
     }
 
     /**
-     * 새로운 심부름 생성
-     *
+     * 새로운 심부름을 생성합니다.
      * @param errandDTO 심부름 DTO
-     * @return 생성된 심부름 DTO
+     * @return 생성된 심부름 DTO와 HTTP 상태
      */
     @PostMapping
     public ResponseEntity<ErrandDTO> createErrand(@RequestBody ErrandDTO errandDTO) {
@@ -61,11 +61,10 @@ public class ErrandController {
     }
 
     /**
-     * 기존 심부름 수정
-     *
-     * @param id 심부름 ID
+     * 기존 심부름을 수정합니다.
+     * @param id 수정할 심부름 ID
      * @param errandDTO 수정할 심부름 정보
-     * @return 수정된 심부름 DTO
+     * @return 수정된 심부름 DTO와 HTTP 상태
      */
     @PutMapping("/{id}")
     public ResponseEntity<ErrandDTO> updateErrand(@PathVariable Long id, @RequestBody ErrandDTO errandDTO) {
@@ -74,10 +73,9 @@ public class ErrandController {
     }
 
     /**
-     * 심부름 삭제
-     *
+     * 심부름을 삭제합니다.
      * @param id 삭제할 심부름 ID
-     * @return 응답 엔티티
+     * @return HTTP 상태
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteErrand(@PathVariable Long id) {
@@ -86,8 +84,7 @@ public class ErrandController {
     }
 
     /**
-     * 카테고리별 심부름 조회
-     *
+     * 카테고리별로 심부름을 조회합니다.
      * @param categoryId 카테고리 ID
      * @param pageable 페이징 정보
      * @return 페이징된 심부름 DTO 목록
@@ -98,8 +95,7 @@ public class ErrandController {
     }
 
     /**
-     * 필터 적용 심부름 조회
-     *
+     * 필터를 적용하여 심부름을 조회합니다.
      * @param location 위치
      * @param categoryId 카테고리 ID
      * @param sortBy 정렬 기준
@@ -116,11 +112,10 @@ public class ErrandController {
     }
 
     /**
-     * 심부름 수락
-     *
+     * 심부름을 수락합니다.
      * @param id 심부름 ID
-     * @param errandDTO
-     * @return
+     * @param errandDTO 심부름 DTO
+     * @return 수정된 심부름 DTO와 HTTP 상태
      */
     @PutMapping("/{id}/accept")
     public ResponseEntity<ErrandDTO> acceptErrand(@PathVariable Long id, @RequestBody ErrandDTO errandDTO) {

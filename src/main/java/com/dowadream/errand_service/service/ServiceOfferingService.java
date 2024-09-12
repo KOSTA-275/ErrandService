@@ -32,6 +32,12 @@ public class ServiceOfferingService {
     private final CategoryRepository categoryRepository;
     private final FileStorageService fileStorageService;
 
+    /**
+     * ServiceOfferingService 생성자
+     * @param serviceOfferingRepository 서비스 제공 리포지토리
+     * @param categoryRepository 카테고리 리포지토리
+     * @param fileStorageService 파일 저장 서비스
+     */
     @Autowired
     public ServiceOfferingService(ServiceOfferingRepository serviceOfferingRepository,
                                   CategoryRepository categoryRepository,
@@ -43,7 +49,6 @@ public class ServiceOfferingService {
 
     /**
      * 페이징 처리된 모든 서비스 제공 목록을 조회합니다.
-     *
      * @param pageable 페이징 정보
      * @return 페이징 처리된 서비스 제공 DTO 목록
      */
@@ -65,7 +70,6 @@ public class ServiceOfferingService {
 
     /**
      * 새로운 서비스 제공을 생성합니다.
-     *
      * @param dto 서비스 제공 DTO
      * @return 생성된 서비스 제공 DTO
      */
@@ -88,7 +92,6 @@ public class ServiceOfferingService {
 
     /**
      * 서비스 제공을 업데이트합니다.
-     *
      * @param id 서비스 제공 ID
      * @param dto 업데이트할 서비스 제공 정보
      * @return 업데이트된 서비스 제공 DTO
@@ -115,7 +118,6 @@ public class ServiceOfferingService {
 
     /**
      * 서비스 제공을 삭제합니다.
-     *
      * @param id 삭제할 서비스 제공 ID
      */
     public void deleteServiceOffering(Long id) {
@@ -127,7 +129,6 @@ public class ServiceOfferingService {
 
     /**
      * 카테고리별로 서비스 제공을 조회합니다.
-     *
      * @param categoryId 카테고리 ID
      * @param pageable 페이징 정보
      * @return 카테고리별 페이징 처리된 서비스 제공 DTO 목록
@@ -150,7 +151,6 @@ public class ServiceOfferingService {
 
     /**
      * DTO의 정보로 서비스 제공 엔티티를 업데이트합니다.
-     *
      * @param serviceOffering 업데이트할 서비스 제공 엔티티
      * @param dto 서비스 제공 DTO
      */
@@ -170,7 +170,6 @@ public class ServiceOfferingService {
 
     /**
      * 서비스 제공 엔티티를 DTO로 변환합니다.
-     *
      * @param serviceOffering 서비스 제공 엔티티
      * @return 서비스 제공 DTO
      */
@@ -206,7 +205,6 @@ public class ServiceOfferingService {
 
     /**
      * 이미지를 업로드하고 이미지 엔티티 목록을 반환합니다.
-     *
      * @param images 업로드할 이미지 파일 목록
      * @return 업로드된 이미지 엔티티 목록
      * @throws IOException 이미지 업로드 중 오류 발생 시
@@ -228,7 +226,6 @@ public class ServiceOfferingService {
 
     /**
      * 필터를 적용하여 서비스 제공을 조회합니다.
-     *
      * @param location 위치
      * @param categoryId 카테고리 ID
      * @param sortBy 정렬 기준
@@ -254,7 +251,6 @@ public class ServiceOfferingService {
 
     /**
      * ID로 서비스 제공을 조회합니다.
-     *
      * @param id 서비스 제공 ID
      * @return 서비스 제공 DTO
      * @throws ResourceNotFoundException 해당 ID의 서비스 제공이 없을 경우

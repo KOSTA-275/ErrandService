@@ -19,8 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 심부름 서비스 클래스
- * 심부름 관련 비즈니스 로직 처리
+ * 심부름 관련 비즈니스 로직을 처리하는 서비스 클래스
  */
 @Service
 @Transactional
@@ -29,6 +28,11 @@ public class ErrandService {
     private final ErrandRepository errandRepository;
     private final CategoryRepository categoryRepository;
 
+    /**
+     * ErrandService 생성자
+     * @param errandRepository 심부름 리포지토리
+     * @param categoryRepository 카테고리 리포지토리
+     */
     @Autowired
     public ErrandService(ErrandRepository errandRepository, CategoryRepository categoryRepository) {
         this.errandRepository = errandRepository;
@@ -36,8 +40,7 @@ public class ErrandService {
     }
 
     /**
-     * 모든 심부름을 페이징하여 조회
-     *
+     * 모든 심부름을 페이징하여 조회합니다.
      * @param pageable 페이징 정보
      * @return 페이징된 심부름 DTO 목록
      */
@@ -58,8 +61,7 @@ public class ErrandService {
     }
 
     /**
-     * ID로 심부름을 조회
-     *
+     * ID로 심부름을 조회합니다.
      * @param id 심부름 ID
      * @return 심부름 DTO (Optional)
      */
@@ -68,8 +70,7 @@ public class ErrandService {
     }
 
     /**
-     * 카테고리별로 심부름을 페이징하여 조회
-     *
+     * 카테고리별로 심부름을 페이징하여 조회합니다.
      * @param categoryId 카테고리 ID
      * @param pageable 페이징 정보
      * @return 페이징된 심부름 DTO 목록
@@ -91,8 +92,7 @@ public class ErrandService {
     }
 
     /**
-     * 필터를 적용하여 심부름을 페이징하여 조회
-     *
+     * 필터를 적용하여 심부름을 페이징하여 조회합니다.
      * @param location 위치
      * @param categoryId 카테고리 ID
      * @param sortBy 정렬 기준
@@ -116,8 +116,7 @@ public class ErrandService {
     }
 
     /**
-     * 새로운 심부름을 생성
-     *
+     * 새로운 심부름을 생성합니다.
      * @param errandDTO 심부름 DTO
      * @return 생성된 심부름 DTO
      */
@@ -127,9 +126,8 @@ public class ErrandService {
     }
 
     /**
-     * 기존 심부름을 수정
-     *
-     * @param id 심부름 ID
+     * 기존 심부름을 수정합니다.
+     * @param id 수정할 심부름 ID
      * @param errandDTO 수정할 심부름 정보
      * @return 수정된 심부름 DTO
      */
@@ -141,8 +139,7 @@ public class ErrandService {
     }
 
     /**
-     * 심부름을 삭제
-     *
+     * 심부름을 삭제합니다.
      * @param id 삭제할 심부름 ID
      */
     public void deleteErrand(Long id) {
@@ -150,11 +147,10 @@ public class ErrandService {
     }
 
     /**
-     * 심부름의 상태 업데이트
-     *
+     * 심부름을 수락합니다.
      * @param id 심부름 ID
-     * @param errandDTO
-     * @return
+     * @param errandDTO 심부름 DTO
+     * @return 수정된 심부름 DTO
      */
     public ErrandDTO acceptErrand(Long id, ErrandDTO errandDTO) {
         Errand errand = errandRepository.findById(id)
@@ -172,7 +168,9 @@ public class ErrandService {
     }
 
     /**
-     * Errand 엔티티 DTO로 변환
+     * 심부름 엔티티를 DTO로 변환합니다.
+     * @param errand 심부름 엔티티
+     * @return 심부름 DTO
      */
     private ErrandDTO convertToDTO(Errand errand) {
         ErrandDTO dto = new ErrandDTO();
@@ -195,7 +193,9 @@ public class ErrandService {
     }
 
     /**
-     * DTO를 엔티티로 변환
+     * 심부름 DTO를 엔티티로 변환합니다.
+     * @param dto 심부름 DTO
+     * @return 심부름 엔티티
      */
     private Errand convertToEntity(ErrandDTO dto) {
         Errand errand = new Errand();
@@ -204,7 +204,9 @@ public class ErrandService {
     }
 
     /**
-     * DTO 정보로 Errand 엔티티 업데이트
+     * DTO의 정보로 심부름 엔티티를 업데이트합니다.
+     * @param errand 업데이트할 심부름 엔티티
+     * @param dto 심부름 DTO
      */
     private void updateErrandFromDTO(Errand errand, ErrandDTO dto) {
         errand.setTitle(dto.getTitle());

@@ -15,12 +15,10 @@ import java.util.List;
 public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering, Long> {
 
     /**
-     * 페이징 처리된 모든 서비스 제공 목록을 조회합니다.
-     * Oracle 데이터베이스의 ROWNUM을 사용하여 페이징을 구현합니다.
-     *
-     * @param startRow 시작 행 번호
-     * @param endRow 끝 행 번호
-     * @return 페이징 처리된 서비스 제공 목록
+     * 페이징 처리된 모든 서비스 제공을 조회합니다.
+     * @param startRow 시작 행
+     * @param endRow 끝 행
+     * @return 페이징된 서비스 제공 목록
      */
     @Query(value = "SELECT * FROM " +
             "(SELECT a.*, ROWNUM rnum FROM " +
@@ -32,19 +30,17 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
 
     /**
      * 전체 서비스 제공 수를 조회합니다.
-     *
      * @return 전체 서비스 제공 수
      */
     @Query(value = "SELECT COUNT(*) FROM service_offerings", nativeQuery = true)
     long countServiceOfferings();
 
     /**
-     * 카테고리별로 서비스 제공을 조회합니다.
-     *
+     * 카테고리별로 페이징 처리된 서비스 제공을 조회합니다.
      * @param categoryId 카테고리 ID
-     * @param startRow 시작 행 번호
-     * @param endRow 끝 행 번호
-     * @return 카테고리별 페이징 처리된 서비스 제공 목록
+     * @param startRow 시작 행
+     * @param endRow 끝 행
+     * @return 카테고리별 페이징된 서비스 제공 목록
      */
     @Query(value = "SELECT * FROM " +
             "(SELECT a.*, ROWNUM rnum FROM " +
@@ -58,7 +54,6 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
 
     /**
      * 카테고리별 전체 서비스 제공 수를 조회합니다.
-     *
      * @param categoryId 카테고리 ID
      * @return 카테고리별 전체 서비스 제공 수
      */
@@ -67,15 +62,12 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
 
     /**
      * 필터를 적용하여 서비스 제공을 조회합니다.
-     * 위치, 카테고리, 정렬 기준에 따라 서비스 제공을 필터링하고 정렬합니다.
-     * Oracle 데이터베이스의 ROWNUM을 사용하여 페이징을 구현합니다.
-     *
-     * @param location 위치 (null이면 모든 위치)
-     * @param categoryId 카테고리 ID (null이면 모든 카테고리)
-     * @param sortBy 정렬 기준 ('latest', 'highestRating', 'mostTasks' 중 하나)
-     * @param startRow 시작 행 번호
-     * @param endRow 끝 행 번호
-     * @return 필터링 및 정렬된 서비스 제공 목록
+     * @param location 위치
+     * @param categoryId 카테고리 ID
+     * @param sortBy 정렬 기준
+     * @param startRow 시작 행
+     * @param endRow 끝 행
+     * @return 필터링된 서비스 제공 목록
      */
     @Query(value = "SELECT * FROM " +
             "(SELECT a.*, ROWNUM rnum FROM " +
@@ -97,12 +89,10 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
             @Param("endRow") int endRow);
 
     /**
-     * 필터를 적용한 서비스 제공의 총 개수를 조회합니다.
-     * 위치와 카테고리에 따라 필터링된 서비스 제공의 총 개수를 반환합니다.
-     *
-     * @param location 위치 (null이면 모든 위치)
-     * @param categoryId 카테고리 ID (null이면 모든 카테고리)
-     * @return 필터링된 서비스 제공의 총 개수
+     * 필터를 적용한 전체 서비스 제공 수를 조회합니다.
+     * @param location 위치
+     * @param categoryId 카테고리 ID
+     * @return 필터링된 전체 서비스 제공 수
      */
     @Query(value = "SELECT COUNT(*) FROM service_offerings so " +
             "WHERE (:location IS NULL OR so.location = :location) " +
